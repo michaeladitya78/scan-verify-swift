@@ -21,7 +21,8 @@ const Auth = () => {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigate("/scanner");
+        // send logged-in users to the home screen; Index will forward to scanner if desired
+        navigate("/");
       }
     });
     return () => unsub();

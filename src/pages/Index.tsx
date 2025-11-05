@@ -8,14 +8,8 @@ import { Shield, Camera, Database, FileCheck } from "lucide-react";
 const Index = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigate("/scanner");
-      }
-    });
-    return () => unsub();
-  }, [navigate]);
+  // Do not auto-redirect from the home page; let Auth redirect to home after login.
+  // The buttons below will route logged-in users to the scanner automatically.
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
@@ -30,10 +24,10 @@ const Index = () => {
             Fast, accurate product verification for customs officers. Scan, verify, and log products instantly with AI-powered OCR technology.
           </p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/auth")} className="min-h-[48px] px-8">
+            <Button size="lg" onClick={() => navigate(auth.currentUser ? "/scanner" : "/auth")} className="min-h-[48px] px-8">
               Get Started
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="min-h-[48px] px-8">
+            <Button size="lg" variant="outline" onClick={() => navigate(auth.currentUser ? "/scanner" : "/auth")} className="min-h-[48px] px-8">
               Sign In
             </Button>
           </div>
