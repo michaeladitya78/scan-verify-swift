@@ -187,8 +187,18 @@ const ManualEntry = () => {
               </div>
             )}
             
-            <form onSubmit={verifyProduct} className="space-y-4">
-              <div>
+            <form onSubmit={verifyProduct} className="space-y-6">
+              {ocrData && (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>OCR Results</AlertTitle>
+                  <AlertDescription>
+                    Text extracted with {Math.round(ocrConfidence * 100)}% confidence. Please verify the details below.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
                 <Label htmlFor="serial">Serial Number *</Label>
                 <Input 
                   id="serial"
@@ -196,11 +206,16 @@ const ManualEntry = () => {
                   value={serialNumber}
                   onChange={(e) => setSerialNumber(e.target.value.toUpperCase())}
                   required
-                  className="font-mono"
+                  className="font-mono text-lg tracking-wide"
+                  pattern="[A-Z0-9-]{6,12}"
+                  title="Serial number should be 6-12 characters long and can contain letters, numbers, and hyphens"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter the product serial number exactly as shown on the label
+                </p>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="hsn">HSN Code *</Label>
                 <Input 
                   id="hsn"
@@ -209,13 +224,21 @@ const ManualEntry = () => {
                   onChange={(e) => setHsnCode(e.target.value)}
                   pattern="[0-9]{6,10}"
                   required
-                  className="font-mono"
+                  className="font-mono text-lg tracking-wide"
+                  title="HSN code should be 6-10 digits"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter the 6-10 digit HSN (Harmonized System Nomenclature) code
+                </p>
               </div>
 
-              <Button type="submit" className="w-full min-h-[48px]" disabled={isVerifying}>
+              <Button 
+                type="submit" 
+                className="w-full min-h-[48px]" 
+                disabled={isVerifying || !serialNumber || !hsnCode}
+              >
                 {isVerifying ? (
-                  "Verifying..."
+                  <><Loader2 className="mr-2 animate-spin" /> Verifying...</>
                 ) : (
                   <><Search className="mr-2" /> Verify Product</>
                 )}
