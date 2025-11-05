@@ -38,6 +38,8 @@ const Auth = () => {
         title: "Welcome back!",
         description: "Successfully signed in.",
       });
+      // Ensure we navigate to scanner after successful sign in
+      navigate("/scanner");
     } catch (error: any) {
       toast({
         title: "Authentication Error",
@@ -63,6 +65,8 @@ const Auth = () => {
         title: "Account Created",
         description: "Welcome to Customs Verification!",
       });
+      // Navigate user to scanner after signup
+      navigate("/scanner");
     } catch (error: any) {
       toast({
         title: "Registration Error",

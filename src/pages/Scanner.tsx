@@ -296,7 +296,14 @@ const Scanner = () => {
           )}
         </Button>
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/manual-entry")}
+            className="min-h-[56px] text-lg"
+          >
+            <Keyboard className="mr-3 w-6 h-6" /> Manual Entry
+          </Button>
           <Button 
             variant="outline" 
             onClick={() => navigate("/history")}
