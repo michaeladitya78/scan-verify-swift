@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface VerificationData {
+export interface VerificationData {
   status: 'PASS' | 'NO_PASS' | 'MANUAL_REVIEW';
   productDescription?: string;
   brand?: string;

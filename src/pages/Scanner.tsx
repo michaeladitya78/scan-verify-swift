@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Loader2, Image as ImageIcon, Keyboard, LogOut, History } from "lucide-react";
 import { VerificationResult } from "@/components/VerificationResult";
+import { performOcr, extractProductInfo } from "@/services/ocr";
 
 interface VerificationData {
   status: 'PASS' | 'NO_PASS' | 'MANUAL_REVIEW';
@@ -81,7 +82,24 @@ const Scanner = () => {
       
       ctx.drawImage(videoRef.current, 0, 0);
       
-      // Convert to blob
+      // Convert to base64 for OCR
+      const base64Image = canvas.toDataURL('image/jpeg', 0.95).split(',')[1];
+      
+      // Perform OCR
+      const { text, confidence } = await performOcr(base64Image);
+      
+      if (!text || confidence < 0.7) {
+        throw new Error('Failed to detect clear text in image');
+      }
+
+      // Extract product information
+      const { serialNumber, hsnCode } = extractProductInfo(text);
+      
+      if (!serialNumber || !hsnCode) {
+        throw new Error('Could not find serial number or HSN code in image');
+      }
+
+      // Upload original image to Firebase Storage
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
@@ -89,21 +107,30 @@ const Scanner = () => {
         }, 'image/jpeg', 0.95);
       });
       
-      // Upload to Firebase Storage
       const fileName = `scan_${Date.now()}.jpg`;
       const objectRef = ref(storage, `verification-images/${fileName}`);
       await uploadBytes(objectRef, blob);
       const publicUrl = await getDownloadURL(objectRef);
-      
-      // For MVP, simulate OCR with manual entry
-      // In production, this would call Google Cloud Vision API
+
+      // Navigate to manual verification with OCR results
+      navigate("/manual-entry", { 
+        state: { 
+          imageUrl: publicUrl,
+          ocrData: {
+            serialNumber,
+            hsnCode,
+            rawText: text,
+            confidence
+          }
+        } 
+      });
+
       toast({
-        title: "Image Captured",
-        description: "Please enter product details manually for verification.",
+        title: "OCR Successful",
+        description: "Please verify the extracted information.",
       });
       
       stopCamera();
-      navigate("/manual-entry", { state: { imageUrl: publicUrl } });
       
     } catch (error: any) {
       toast({

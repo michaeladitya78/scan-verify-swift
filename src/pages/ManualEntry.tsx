@@ -29,9 +29,11 @@ const ManualEntry = () => {
   const location = useLocation();
   const { toast } = useToast();
   const imageUrl = location.state?.imageUrl;
+  const ocrData = location.state?.ocrData;
 
-  const [serialNumber, setSerialNumber] = useState("");
-  const [hsnCode, setHsnCode] = useState("");
+  const [serialNumber, setSerialNumber] = useState(ocrData?.serialNumber || "");
+  const [hsnCode, setHsnCode] = useState(ocrData?.hsnCode || "");
+  const [ocrConfidence, setOcrConfidence] = useState(ocrData?.confidence || 0);
   const [isVerifying, setIsVerifying] = useState(false);
   const [result, setResult] = useState<VerificationData | null>(null);
   const [showResults, setShowResults] = useState(false);
@@ -167,7 +169,12 @@ const ManualEntry = () => {
         <Card>
           <CardHeader>
             <CardTitle>Manual Product Entry</CardTitle>
-            <CardDescription>Enter product details manually for verification</CardDescription>
+            <CardDescription>
+              {ocrData ? 
+                `OCR extracted data with ${Math.round(ocrConfidence * 100)}% confidence. Please verify.` :
+                "Enter product details manually for verification"
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {imageUrl && (
