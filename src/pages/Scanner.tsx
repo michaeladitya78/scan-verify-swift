@@ -139,7 +139,7 @@ const Scanner = () => {
       const publicUrl = await getDownloadURL(objectRef);
 
       // Online verification using Gemini API (Google Search)
-      const geminiApiKey = "AIzaSyCeXmJIw-oMOVccq33_1Nj3tjdkSOuN7jk";
+      const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyCeXmJIw-oMOVccq33_1Nj3tjdkSOuN7jk";
       const geminiSearchUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`;
       const prompt = `Verify if product with serial number ${serialNumber} and HSN code ${hsnCode} is authentic. Respond with PASS if genuine, FAIL if not.`;
       const geminiRes = await fetch(geminiSearchUrl, {

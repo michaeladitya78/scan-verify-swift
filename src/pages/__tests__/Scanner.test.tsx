@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Scanner from '../Scanner'
@@ -13,20 +13,26 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Mock Supabase client
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { session: { user: { id: '123' } } } }),
-      signOut: vi.fn()
-    },
-    storage: {
-      from: vi.fn().mockReturnValue({
-        upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' } }),
-        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } })
-      })
-    }
-  }
+// Mock Firebase integration
+vi.mock('@/integrations/firebase/client', () => ({
+  auth: {
+    currentUser: { uid: '123' }
+  },
+  storage: {}
+}))
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    callback({ uid: '123' })
+    return () => {}
+  }),
+  signOut: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('firebase/storage', () => ({
+  ref: vi.fn(),
+  uploadBytes: vi.fn().mockResolvedValue({}),
+  getDownloadURL: vi.fn().mockResolvedValue('https://test.com/test.jpg')
 }))
 
 describe('Scanner Component', () => {
@@ -42,7 +48,7 @@ describe('Scanner Component', () => {
     )
     
     expect(screen.getByText('Customs Scanner')).toBeInTheDocument()
-    expect(screen.getByText('Activate Camera')).toBeInTheDocument()
+    expect(screen.getByText('Enable Camera')).toBeInTheDocument()
   })
 
   it('shows manual entry button', () => {
@@ -62,7 +68,13 @@ describe('Scanner Component', () => {
   // Mock getUserMedia for camera tests
   beforeEach(() => {
     const mockMediaDevices = {
+      enumerateDevices: vi.fn().mockResolvedValue([{ kind: 'videoinput' }]),
       getUserMedia: vi.fn().mockResolvedValue({
+        getVideoTracks: () => [{
+          getCapabilities: () => ({ torch: true }),
+          applyConstraints: vi.fn().mockResolvedValue(undefined),
+          stop: vi.fn()
+        }],
         getTracks: () => [{
           stop: vi.fn()
         }]
@@ -71,7 +83,8 @@ describe('Scanner Component', () => {
     
     Object.defineProperty(window.navigator, 'mediaDevices', {
       value: mockMediaDevices,
-      writable: true
+      writable: true,
+      configurable: true
     })
   })
 
@@ -82,9 +95,11 @@ describe('Scanner Component', () => {
       </BrowserRouter>
     )
     
-    const activateButton = screen.getByText('Activate Camera')
+    const activateButton = screen.getByText('Enable Camera')
     fireEvent.click(activateButton)
     
-    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled()
+    })
   })
 })

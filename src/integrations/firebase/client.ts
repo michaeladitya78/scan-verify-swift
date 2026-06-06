@@ -6,13 +6,13 @@ import { getStorage } from "firebase/storage";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-	apiKey: "AIzaSyCeXmJIw-oMOVccq33_1Nj3tjdkSOuN7jk",
-	authDomain: "scan-verify.firebaseapp.com",
-	projectId: "scan-verify",
-	storageBucket: "scan-verify.firebasestorage.app",
-	messagingSenderId: "141675485557",
-	appId: "1:141675485557:web:87be6576736094f7801b3c",
-	measurementId: "G-6DRK8X2TZ9",
+	apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCeXmJIw-oMOVccq33_1Nj3tjdkSOuN7jk",
+	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "scan-verify.firebaseapp.com",
+	projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "scan-verify",
+	storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "scan-verify.firebasestorage.app",
+	messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "141675485557",
+	appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:141675485557:web:87be6576736094f7801b3c",
+	measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-6DRK8X2TZ9",
 };
 
 const app = initializeApp(firebaseConfig);

@@ -28,14 +28,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
-        working-directory: ./scan-verify-swift-main
       - name: Build
         run: npm run build
-        working-directory: ./scan-verify-swift-main
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./scan-verify-swift-main/dist
+          path: ./dist
 
   deploy:
     needs: build

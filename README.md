@@ -1,31 +1,64 @@
-# Customs Verification App
+# Customs Verification — Field Scanner
 
-This project uses Vite, React, TypeScript, shadcn-ui, Tailwind CSS, and Firebase (Auth, Firestore, Storage).
+This repository contains a React + TypeScript web application (Vite) designed as a field officer portal for customs product verification. It provides a mobile-first UI for capturing product images using the device camera, verifying product details (serial number, HSN code) using AI-powered OCR technology, checking authenticity via Google Gemini Pro, and logging audit records to a Firebase backend.
 
-Development
+## Architecture & Tech Stack
 
-```sh
-npm install
-npm run dev
-```
+- **Framework**: Vite + React + TypeScript
+- **UI & Styling**: Tailwind CSS + Radix UI (shadcn-ui components) + Lucide Icons
+- **Backend Services**: Firebase (Authentication, Firestore Database, Cloud Storage)
+- **AI Processing**: Google Gemini API (Content Generation & Verification)
+- **OCR Engine**: AI-powered text extraction helper utilities
 
-Genkit setup
+## Key Files
 
-1) Install deps (already added):
+- `src/main.tsx` — App entry point that mounts React
+- `src/App.tsx` — Top-level providers, routing, and page mapping
+- `src/pages/` — Page components:
+  - `Index.tsx` — Home landing page (routes authenticated users to scanner)
+  - `Auth.tsx` — Firebase email/password login and sign up
+  - `Scanner.tsx` — Camera scanning UI with viewfinder and verification checks
+  - `ManualEntry.tsx` — Manual fallback verification form
+  - `History.tsx` — Log viewer with CSV exporting utility
+- `src/integrations/firebase/client.ts` — Firebase client configuration and instance creation
+- `src/services/ocr.ts` — Text extraction helper utilities
 
-```sh
-npm i --save genkit @genkit-ai/googleai
-```
+## Local Development
 
-2) Set API key (PowerShell example):
+### Prerequisites
 
-```powershell
-$env:GOOGLE_GENAI_API_KEY = "<your API key>"
-```
+- Node.js (version 18 or above recommended)
+- npm
 
-3) Optional test (Node only):
+### Setup
 
-```ts
-import { helloFlow } from './src/integrations/genkit/client';
-helloFlow('Chris').then(console.log);
-```
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Configure Firebase**:
+   The Firebase config is pre-configured in `src/integrations/firebase/client.ts`. Ensure your Firebase project is set up with:
+   - Authentication (Email/Password provider enabled)
+   - Firestore (with `products` and `verification_logs` collections)
+   - Storage (with a `verification-images` folder/bucket configuration)
+
+3. **Start Dev Server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:8080](http://localhost:8080) in your browser.
+
+4. **Product Seeding** (Optional):
+   To seed the Firestore database with sample products for testing:
+   ```bash
+   npm run seed
+   ```
+
+## Environment Variables for Vercel / GitHub Actions
+
+This project uses pre-configured Firebase config and Gemini API keys inside client-side modules to allow immediate demonstration. 
+For production environments, ensure you secure these keys appropriately by configuring them as client-side environment variables prefixed with `VITE_` if you decide to transition to dynamic loading (e.g., `VITE_FIREBASE_API_KEY`, `VITE_GEMINI_API_KEY`).
+
+- **Vercel**: No special build-time environment variables are strictly required for the current codebase since configuration is embedded, but you can override configurations if you customize the client integration.
+- **GitHub Actions**: The repository includes a GitHub Pages deploy workflow under `.github/workflows/deploy.yml`. When deploying, verify that the repository settings permit writing to pages and that the workflow has appropriate permissions.

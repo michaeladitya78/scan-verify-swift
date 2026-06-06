@@ -15,7 +15,8 @@ describe('VerificationResult Component', () => {
     extractedSerial: 'TEST123',
     extractedHsn: 'HSN123',
     hsnMatch: true,
-    modelMatch: true
+    modelMatch: true,
+    capturedImageUrl: 'https://test.com/test.jpg'
   }
 
   const mockFailResult: VerificationData = {
@@ -26,7 +27,8 @@ describe('VerificationResult Component', () => {
     extractedSerial: 'TEST123',
     extractedHsn: 'HSN123',
     hsnMatch: false,
-    modelMatch: true
+    modelMatch: true,
+    capturedImageUrl: 'https://test.com/test.jpg'
   }
 
   it('displays pass result correctly', () => {
@@ -64,8 +66,8 @@ describe('VerificationResult Component', () => {
       />
     )
     
-    const closeButton = screen.getByRole('button', { name: /close/i })
-    fireEvent.click(closeButton)
+    const closeButtons = screen.getAllByRole('button', { name: /close/i })
+    fireEvent.click(closeButtons[0])
     expect(mockOnClose).toHaveBeenCalled()
   })
 

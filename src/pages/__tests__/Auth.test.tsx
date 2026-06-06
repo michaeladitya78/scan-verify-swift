@@ -13,11 +13,22 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Mock Firebase auth
+// Mock Firebase client
 vi.mock('@/integrations/firebase/client', () => ({
   auth: {
     currentUser: null
   }
+}))
+
+// Mock Firebase auth functions
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    callback(null)
+    return () => {}
+  }),
+  signInWithEmailAndPassword: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
+  updateProfile: vi.fn()
 }))
 
 describe('Auth Component', () => {
@@ -32,8 +43,8 @@ describe('Auth Component', () => {
       </BrowserRouter>
     )
     
-    expect(screen.getByText('Sign In')).toBeInTheDocument()
-    expect(screen.getByText('Sign Up')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Sign In' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Sign Up' })).toBeInTheDocument()
   })
 
   it('shows error on invalid email format', async () => {
@@ -46,7 +57,7 @@ describe('Auth Component', () => {
     const emailInput = screen.getByPlaceholderText('officer@customs.gov')
     fireEvent.change(emailInput, { target: { value: 'invalid-email' } })
     
-    const signInButton = screen.getByText('Sign In')
+    const signInButton = screen.getByRole('button', { name: 'Sign In' })
     fireEvent.click(signInButton)
     
     expect(emailInput).toBeInvalid()
